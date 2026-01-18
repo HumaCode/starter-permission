@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use App\Http\Resources\UserSingleResource;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -32,8 +33,12 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'auth' => [
-                'user' => $request->user(),
+             'auth' => [
+                'user' => $request->user() ? new UserSingleResource($request->user()) : null,
+            ],
+            'flash_message' => fn () => [
+                'type' => $request->session()->get('type'),
+                'message' => $request->session()->get('message'),
             ],
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
