@@ -12,7 +12,9 @@ import {
     IconLogout2,
     IconLogs,
     IconMenorah,
+    IconMenu,
     IconMoneybag,
+    IconShield,
 } from '@tabler/icons-react';
 
 export default function Sidebar({ auth, url }) {
@@ -39,14 +41,24 @@ export default function Sidebar({ auth, url }) {
 
             <ul role="list" className="flex flex-1 flex-col gap-y-2">
                 <div className="px-3 py-2 text-sm font-medium text-muted-foreground">General</div>
-                <NavLink url="#" active={url.startsWith('/dashboard')} title="Dashboard" icon={IconBox} />
+                <NavLink url={route('dashboard')} active={url.startsWith('/dashboard')} title="Dashboard" icon={IconBox} />
+
+
 
                 <div className="px-3 py-2 text-sm font-medium text-muted-foreground">Master</div>
                 <NavLink
-                    url="#"
-                    active={url.startsWith('/dashboard')}
-                    title="Metode Pembayaran"
-                    icon={IconCreditCardPay}
+                    url={route('menus.index')}
+                    active={url.startsWith('/menus')}
+                    title="Menu"
+                    icon={IconMenu}
+                />
+
+                <div className="px-3 py-2 text-sm font-medium text-muted-foreground">Role Permission</div>
+                <NavLink
+                    url={route('roles.index')}
+                    active={url.startsWith('/roles')}
+                    title="Role Management"
+                    icon={IconShield}
                 />
 
                 <div className="px-3 py-2 text-sm font-medium text-muted-foreground">Rencana</div>
