@@ -4,6 +4,7 @@ import { Head, Link, usePage } from "@inertiajs/react";
 import { IconLayoutSidebar, IconX } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 import Sidebar from "./Partials/Sidebar";
+import ThemeSwitcher from "@/Components/Dark/ThemeSwitcher";
 
 export default function AppLayout({ title, children }) {
 
@@ -102,6 +103,10 @@ export default function AppLayout({ title, children }) {
                         {children}
                     </div>
                 </main>
+
+                <div className="fixed flex justify-center w-full bottom-5 end-5 lg:justify-end">
+                    <ThemeSwitcher />
+                </div>
             </div>
         </>
     )
