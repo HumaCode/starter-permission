@@ -1,12 +1,15 @@
 import { Avatar, AvatarFallback } from "@/Components/ui/avatar";
 import { Dialog, Transition } from "@headlessui/react";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { IconLayoutSidebar, IconX } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
+import Sidebar from "./Partials/Sidebar";
 
 export default function AppLayout({ title, children }) {
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const { url } = usePage();
 
     return (
         <>
@@ -71,6 +74,8 @@ export default function AppLayout({ title, children }) {
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
                     <div className="flex flex-col px-4 overflow-y-auto grow gap-y-5 bg-slate-50 dark:border-r dark:border-r-card dark:bg-background">
                         {/* sidebar */}
+
+                        <Sidebar url={url} />
                     </div>
                 </div>
 
