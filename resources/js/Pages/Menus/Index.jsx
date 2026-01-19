@@ -1,31 +1,29 @@
-import AlertAction from "@/Components/AlertAction";
-import Banner from "@/Components/Banner";
-import BreadcrumbHeader from "@/Components/BreadcrumbHeader";
-import Filter from "@/Components/Datatable/Filter";
-import PaginationTable from "@/Components/Datatable/PaginationTable";
-import ShowFilter from "@/Components/Datatable/ShowFilter";
-import EmptyState from "@/Components/EmptyState";
-import HeaderTitle from "@/Components/HeaderTitle";
-import DynamicIcon from "@/Components/DynamicIcon";
-import { UseFilter } from "@/Components/Hooks/UseFilter";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
-import { Badge } from "@/Components/ui/badge";
-import AppLayout from "@/Layouts/AppLayout";
-import { Link, router } from "@inertiajs/react";
+import AlertAction from '@/Components/AlertAction';
+import Banner from '@/Components/Banner';
+import BreadcrumbHeader from '@/Components/BreadcrumbHeader';
+import Filter from '@/Components/Datatable/Filter';
+import PaginationTable from '@/Components/Datatable/PaginationTable';
+import ShowFilter from '@/Components/Datatable/ShowFilter';
+import DynamicIcon from '@/Components/DynamicIcon';
+import EmptyState from '@/Components/EmptyState';
+import HeaderTitle from '@/Components/HeaderTitle';
+import { UseFilter } from '@/Components/Hooks/UseFilter';
+import { Badge } from '@/Components/ui/badge';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/Components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import AppLayout from '@/Layouts/AppLayout';
+import { Link, router } from '@inertiajs/react';
 import {
     IconArrowsDownUp,
+    IconCircleCheck,
+    IconCircleX,
+    IconMenu2,
     IconPencil,
     IconPlus,
     IconTrash,
-    IconMenu2,
-    IconEye,
-    IconCircleCheck,
-    IconCircleX,
-    IconLayoutGrid
-} from "@tabler/icons-react";
-import { useState } from "react";
+} from '@tabler/icons-react';
+import { useState } from 'react';
 
 export default function Index(props) {
     const { data: menus, meta, links } = props.menus;
@@ -62,17 +60,14 @@ export default function Index(props) {
     };
 
     return (
-        <div className="flex flex-col w-full pb-32 gap-y-6">
+        <div className="flex w-full flex-col gap-y-6 pb-32">
             <BreadcrumbHeader items={props.items} />
 
-            <Banner
-                title={props.pageSettings.banner.title}
-                subtitle={props.pageSettings.banner.subtitle}
-            />
+            <Banner title={props.pageSettings.banner.title} subtitle={props.pageSettings.banner.subtitle} />
 
             <Card>
                 <CardHeader className="p-0">
-                    <div className="flex flex-col items-start justify-between p-4 gap-y-4 lg:flex-row lg:items-center">
+                    <div className="flex flex-col items-start justify-between gap-y-4 p-4 lg:flex-row lg:items-center">
                         <HeaderTitle
                             title={props.pageSettings.title}
                             subtitle={props.pageSettings.subtitle}
@@ -115,11 +110,11 @@ export default function Index(props) {
                                         <TableHead className="w-12">
                                             <Button
                                                 variant="ghost"
-                                                className="inline-flex group"
+                                                className="group inline-flex"
                                                 onClick={() => onSortable('id')}
                                             >
                                                 #
-                                                <span className="flex-none ml-2 rounded text-muted-foreground">
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
                                             </Button>
@@ -128,11 +123,11 @@ export default function Index(props) {
                                         <TableHead className="min-w-[250px]">
                                             <Button
                                                 variant="ghost"
-                                                className="inline-flex group"
+                                                className="group inline-flex"
                                                 onClick={() => onSortable('name')}
                                             >
                                                 Nama Menu
-                                                <span className="flex-none ml-2 rounded text-muted-foreground">
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
                                             </Button>
@@ -141,11 +136,11 @@ export default function Index(props) {
                                         <TableHead className="w-32">
                                             <Button
                                                 variant="ghost"
-                                                className="inline-flex group"
+                                                className="group inline-flex"
                                                 onClick={() => onSortable('level')}
                                             >
                                                 Level
-                                                <span className="flex-none ml-2 rounded text-muted-foreground">
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
                                             </Button>
@@ -158,11 +153,11 @@ export default function Index(props) {
                                         <TableHead className="w-24 text-center">
                                             <Button
                                                 variant="ghost"
-                                                className="inline-flex group"
+                                                className="group inline-flex"
                                                 onClick={() => onSortable('order')}
                                             >
                                                 Order
-                                                <span className="flex-none ml-2 rounded text-muted-foreground">
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
                                             </Button>
@@ -173,11 +168,11 @@ export default function Index(props) {
                                         <TableHead className="w-32">
                                             <Button
                                                 variant="ghost"
-                                                className="inline-flex group"
+                                                className="group inline-flex"
                                                 onClick={() => onSortable('is_active')}
                                             >
                                                 Status
-                                                <span className="flex-none ml-2 rounded text-muted-foreground">
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
                                             </Button>
@@ -186,11 +181,11 @@ export default function Index(props) {
                                         <TableHead className="w-40">
                                             <Button
                                                 variant="ghost"
-                                                className="inline-flex group"
+                                                className="group inline-flex"
                                                 onClick={() => onSortable('created_at')}
                                             >
                                                 Dibuat Pada
-                                                <span className="flex-none ml-2 rounded text-muted-foreground">
+                                                <span className="ml-2 flex-none rounded text-muted-foreground">
                                                     <IconArrowsDownUp className="size-4" />
                                                 </span>
                                             </Button>
@@ -203,14 +198,14 @@ export default function Index(props) {
                                 <TableBody>
                                     {menus.map((menu, index) => (
                                         <TableRow key={index}>
-                                            <TableCell className="font-medium text-center">
+                                            <TableCell className="text-center font-medium">
                                                 {index + 1 + (meta.current_page - 1) * meta.per_page}
                                             </TableCell>
 
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     {menu.icon && (
-                                                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 border border-emerald-200 dark:border-emerald-800">
+                                                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 dark:border-emerald-800 dark:from-emerald-950 dark:to-teal-950">
                                                             <DynamicIcon
                                                                 name={menu.icon}
                                                                 className="size-5 text-emerald-600 dark:text-emerald-400"
@@ -236,34 +231,30 @@ export default function Index(props) {
                                                 {menu.parent ? (
                                                     <span className="text-sm font-medium">{menu.parent.name}</span>
                                                 ) : (
-                                                    <span className="text-sm text-muted-foreground italic">Root</span>
+                                                    <span className="text-sm italic text-muted-foreground">Root</span>
                                                 )}
                                             </TableCell>
 
                                             <TableCell>
                                                 {menu.route ? (
-                                                    <code className="text-xs bg-muted/80 px-2 py-1 rounded font-mono">
+                                                    <code className="rounded bg-muted/80 px-2 py-1 font-mono text-xs">
                                                         {menu.route}
                                                     </code>
                                                 ) : (
-                                                    <span className="text-sm text-muted-foreground italic">No route</span>
+                                                    <span className="text-sm italic text-muted-foreground">
+                                                        No route
+                                                    </span>
                                                 )}
                                             </TableCell>
 
                                             <TableCell className="text-center">
-                                                <Badge
-                                                    variant="outline"
-                                                    className="font-mono font-semibold"
-                                                >
+                                                <Badge variant="outline" className="font-mono font-semibold">
                                                     {menu.order}
                                                 </Badge>
                                             </TableCell>
 
                                             <TableCell className="text-center">
-                                                <Badge
-                                                    variant="outline"
-                                                    className="font-semibold"
-                                                >
+                                                <Badge variant="outline" className="font-semibold">
                                                     {menu.permissions_count}
                                                 </Badge>
                                             </TableCell>
@@ -323,9 +314,10 @@ export default function Index(props) {
                     )}
                 </CardContent>
 
-                <CardFooter className="flex flex-col items-center justify-between w-full py-3 border-t gap-y-2 lg:flex-row">
+                <CardFooter className="flex w-full flex-col items-center justify-between gap-y-2 border-t py-3 lg:flex-row">
                     <p className="text-sm text-muted-foreground">
-                        Menampilkan <span className="font-medium text-emerald-600">{meta.from ?? 0}</span> dari {meta.total} menu
+                        Menampilkan <span className="font-medium text-emerald-600">{meta.from ?? 0}</span> dari{' '}
+                        {meta.total} menu
                     </p>
 
                     <div className="overflow-x-auto">

@@ -30,8 +30,8 @@ return new class extends Migration
 
         Schema::create('menu_permission', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('menu_id')->constrained()->cascadeOnDelete();
-            $table->foreignUuid('permission_id')->constrained()->cascadeOnDelete();
+            $table->uuid('menu_id')->constrained()->cascadeOnDelete();
+            $table->uuid('permission_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
             $table->unique(['menu_id', 'permission_id']);

@@ -48,7 +48,7 @@ class Menu extends Model
             if ($model->parent_id) {
                 $parent = static::find($model->parent_id);
                 if ($parent) {
-                    $model->level = match($parent->level) {
+                    $model->level = match ($parent->level) {
                         'menu' => 'submenu',
                         'submenu' => 'childmenu',
                         default => 'childmenu'
@@ -67,8 +67,8 @@ class Menu extends Model
         $query->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'REGEXP', $search)
-                  ->orWhere('slug', 'REGEXP', $search)
-                  ->orWhere('route', 'REGEXP', $search);
+                    ->orWhere('slug', 'REGEXP', $search)
+                    ->orWhere('route', 'REGEXP', $search);
             });
         });
 
@@ -220,7 +220,7 @@ class Menu extends Model
      */
     public function getLevelBadgeColor(): string
     {
-        return match($this->level) {
+        return match ($this->level) {
             'menu' => 'blue',
             'submenu' => 'green',
             'childmenu' => 'purple',
@@ -233,7 +233,7 @@ class Menu extends Model
      */
     public function getLevelLabel(): string
     {
-        return match($this->level) {
+        return match ($this->level) {
             'menu' => 'Menu',
             'submenu' => 'Submenu',
             'childmenu' => 'Child Menu',

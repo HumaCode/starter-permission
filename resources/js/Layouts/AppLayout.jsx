@@ -1,16 +1,16 @@
-import { Avatar, AvatarFallback } from "@/Components/ui/avatar";
-import { Dialog, Transition } from "@headlessui/react";
-import { Head, Link, usePage } from "@inertiajs/react";
-import { IconLayoutSidebar, IconX } from "@tabler/icons-react";
-import { Fragment, useState } from "react";
-import Sidebar from "./Partials/Sidebar";
-import ThemeSwitcher from "@/Components/Dark/ThemeSwitcher";
+import ThemeSwitcher from '@/Components/Dark/ThemeSwitcher';
+import { Avatar, AvatarFallback } from '@/Components/ui/avatar';
+import { Dialog, Transition } from '@headlessui/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { IconLayoutSidebar, IconX } from '@tabler/icons-react';
+import { Fragment, useState } from 'react';
+import Sidebar from './Partials/Sidebar';
 
 export default function AppLayout({ title, children }) {
-
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const auth = usePage().props.auth.user;
 
+    // ← Destructure semua props yang dibutuhkan
+    const { auth, menus = [] } = usePage().props; // ← Tambahkan menus di sini
     const { url } = usePage();
 
     return (
@@ -18,11 +18,12 @@ export default function AppLayout({ title, children }) {
             <Head title={title} />
             <div>
                 <Transition.Root show={sidebarOpen} as={Fragment}>
-                    <Dialog as='div' className='relative z-50 lg:hidden' onClose={setSidebarOpen}>
+                    <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
                         <Transition.Child
                             as={Fragment}
                             enter="transition-opacity ease-linier duration-300"
-                            enterFrom="opacity-0" enterTo="opacity-100"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
                             leave="transition-opacity ease-linear duration-300"
                             leaveFrom="opacity-100"
                             leaveTo="opacity-0"
@@ -40,7 +41,7 @@ export default function AppLayout({ title, children }) {
                                 leaveFrom="translate-x-0"
                                 leaveTo="-translate-x-full"
                             >
-                                <Dialog.Panel className='relative flex flex-1 w-full max-w-sm mr-16'>
+                                <Dialog.Panel className="relative mr-16 flex w-full max-w-sm flex-1">
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-in-out duration-300"
@@ -50,66 +51,63 @@ export default function AppLayout({ title, children }) {
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-
-                                        <div className="absolute top-0 flex justify-center w-16 pt-5 left-full">
+                                        <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
                                             <button
                                                 type="button"
                                                 className="-m-2.5 p-2.5"
                                                 onClick={() => setSidebarOpen(false)}
                                             >
-                                                <IconX className="text-white size-6" />
+                                                <IconX className="size-6 text-white" />
                                             </button>
                                         </div>
-
                                     </Transition.Child>
 
-                                    <div className="flex flex-col px-6 pb-2 overflow-y-auto bg-white grow gap-y-5 dark:bg-background">
-                                        {/* sidebar */}
-                                        <Sidebar auth={auth} url={url} />
+                                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-2 dark:bg-background">
+                                        {/* Mobile Sidebar */}
+                                        <Sidebar auth={auth} url={window.location.pathname} menus={menus} />
                                     </div>
-
                                 </Dialog.Panel>
                             </Transition.Child>
                         </div>
                     </Dialog>
                 </Transition.Root>
 
+                {/* Desktop Sidebar */}
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-                    <div className="flex flex-col px-4 overflow-y-auto grow gap-y-5 bg-slate-50 dark:border-r dark:border-r-card dark:bg-background">
-                        {/* sidebar */}
-
-                        <Sidebar auth={auth} url={url} />
+                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-50 px-4 dark:border-r dark:border-r-card dark:bg-background">
+                        <Sidebar auth={auth} url={window.location.pathname} menus={menus} />
                     </div>
                 </div>
 
-                <div className="sticky top-0 z-40 flex items-center p-4 bg-white shadow-sm gap-x-6 dark:bg-background sm:px-6 lg:hidden">
-                    <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
+                {/* Mobile Header */}
+                <div className="sticky top-0 z-40 flex items-center gap-x-6 bg-white p-4 shadow-sm dark:bg-background sm:px-6 lg:hidden">
+                    <button
+                        type="button"
+                        className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+                        onClick={() => setSidebarOpen(true)}
+                    >
                         <IconLayoutSidebar className="size-6" />
                     </button>
 
-                    <div className="flex-1 text-sm font-semibold leading-6 text-foreground">
-                        {title}
-                    </div>
+                    <div className="flex-1 text-sm font-semibold leading-6 text-foreground">{title}</div>
 
-                    <Link href='#'>
+                    <Link href="#">
                         <Avatar>
-                            <AvatarFallback>
-                                X
-                            </AvatarFallback>
+                            <AvatarFallback>{auth?.user?.name?.substring(0, 1).toUpperCase() || 'U'}</AvatarFallback>
                         </Avatar>
                     </Link>
                 </div>
 
+                {/* Main Content */}
                 <main className="py-4 dark:bg-background lg:pl-72">
-                    <div className="px-4">
-                        {children}
-                    </div>
+                    <div className="px-4">{children}</div>
                 </main>
 
-                <div className="fixed flex justify-center w-full bottom-5 end-5 lg:justify-end">
+                {/* Theme Switcher */}
+                <div className="fixed bottom-5 end-5 flex w-full justify-center lg:justify-end">
                     <ThemeSwitcher />
                 </div>
             </div>
         </>
-    )
+    );
 }

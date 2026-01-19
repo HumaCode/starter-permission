@@ -1,22 +1,22 @@
-import AlertAction from "@/Components/AlertAction";
-import Banner from "@/Components/Banner";
-import BreadcrumbHeader from "@/Components/BreadcrumbHeader";
-import Filter from "@/Components/Datatable/Filter";
-import PaginationTable from "@/Components/Datatable/PaginationTable";
-import ShowFilter from "@/Components/Datatable/ShowFilter";
-import EmptyState from "@/Components/EmptyState";
-import HeaderTitle from "@/Components/HeaderTitle";
-import { UseFilter } from "@/Components/Hooks/UseFilter";
-import { Button } from "@/Components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
-import AppLayout from "@/Layouts/AppLayout"
-import { Link } from "@inertiajs/react";
-import { IconArrowsDownUp, IconMoneybag, IconPencil, IconPlus, IconShield, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import AlertAction from '@/Components/AlertAction';
+import Banner from '@/Components/Banner';
+import BreadcrumbHeader from '@/Components/BreadcrumbHeader';
+import Filter from '@/Components/Datatable/Filter';
+import PaginationTable from '@/Components/Datatable/PaginationTable';
+import ShowFilter from '@/Components/Datatable/ShowFilter';
+import EmptyState from '@/Components/EmptyState';
+import HeaderTitle from '@/Components/HeaderTitle';
+import { UseFilter } from '@/Components/Hooks/UseFilter';
+import { Button } from '@/Components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/Components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/Components/ui/table';
+import AppLayout from '@/Layouts/AppLayout';
+import { formatDateIndo } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
+import { IconArrowsDownUp, IconPencil, IconPlus, IconShield, IconTrash } from '@tabler/icons-react';
+import { useState } from 'react';
 
-export default function Index(props)
-{
+export default function Index(props) {
     const { data: roles, meta, links } = props.roles;
 
     const [params, setParams] = useState(props.state);
@@ -26,34 +26,33 @@ export default function Index(props)
             ...params,
             field: field,
             direction: params.direction === 'asc' ? 'desc' : 'asc',
-        })
-    }
+        });
+    };
 
     UseFilter({
         route: route('roles.index'),
         values: params,
         only: ['roles'],
-    })
+    });
 
     return (
-        <div className="flex flex-col w-full pb-32 gap-y-6">
+        <div className="flex w-full flex-col gap-y-6 pb-32">
             <BreadcrumbHeader items={props.items} />
 
             <Banner title={props.pageSettings.banner.title} subtitle={props.pageSettings.banner.subtitle} />
 
             <Card>
-                <CardHeader className='p-0'>
-                    <div className='flex flex-col items-start justify-between p-4 gap-y-4 lg:flex-row lg:items-center'>
+                <CardHeader className="p-0">
+                    <div className="flex flex-col items-start justify-between gap-y-4 p-4 lg:flex-row lg:items-center">
                         <HeaderTitle
                             title={props.pageSettings.title}
                             subtitle={props.pageSettings.subtitle}
                             icon={IconShield}
                         />
 
-                        <Button variant='emerald' size='xl' asChild>
+                        <Button variant="emerald" size="xl" asChild>
                             <Link href={route('roles.create')}>
                                 <IconPlus className="size-4" />
-
                                 Tambah Data
                             </Link>
                         </Button>
@@ -61,101 +60,91 @@ export default function Index(props)
 
                     <Filter params={params} setParams={setParams} state={props.state} />
                     <ShowFilter params={params} />
-
                 </CardHeader>
 
-                <CardContent className='p-0 [&-td]:whitespace-nowrap [&-td]:px-6 [&-th]:px-6'>
+                <CardContent className="p-0 [&-td]:whitespace-nowrap [&-td]:px-6 [&-th]:px-6">
                     {roles.length === 0 ? (
-                        <EmptyState
-                            icon={IconShield}
-                            title="Tidak ada data role"
-                            subtitle="Buat role baru"
-                        />
-
+                        <EmptyState icon={IconShield} title="Tidak ada data role" subtitle="Buat role baru" />
                     ) : (
-                        <Table className='w-full'>
+                        <Table className="w-full">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>
                                         <Button
-                                            variant='ghos'
-                                            className='inline-flex group'
+                                            variant="ghos"
+                                            className="group inline-flex"
                                             onClick={() => onSortable('id')}
-                                        />
-                                        #
-
-                                        <span className="flex-none ml-2 rounded text-muted-foreground">
-                                            <IconArrowsDownUp className="size-4" />
-                                        </span>
+                                        >
+                                            #
+                                            <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                <IconArrowsDownUp className="size-4" />
+                                            </span>
+                                        </Button>
                                     </TableHead>
 
                                     <TableHead>
                                         <Button
-                                            variant='ghos'
-                                            className='inline-flex group'
+                                            variant="ghos"
+                                            className="group inline-flex"
                                             onClick={() => onSortable('name')}
-                                        />
-                                        Nama Role
-
-                                        <span className="flex-none ml-2 rounded text-muted-foreground">
-                                            <IconArrowsDownUp className="size-4" />
-                                        </span>
+                                        >
+                                            Nama Role
+                                            <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                <IconArrowsDownUp className="size-4" />
+                                            </span>
+                                        </Button>
                                     </TableHead>
 
                                     <TableHead>
                                         <Button
-                                            variant='ghos'
-                                            className='inline-flex group'
+                                            variant="ghos"
+                                            className="group inline-flex"
                                             onClick={() => onSortable('guard_name')}
-                                        />
-                                        Guard
-
-                                        <span className="flex-none ml-2 rounded text-muted-foreground">
-                                            <IconArrowsDownUp className="size-4" />
-                                        </span>
+                                        >
+                                            Guard
+                                            <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                <IconArrowsDownUp className="size-4" />
+                                            </span>
+                                        </Button>
                                     </TableHead>
 
                                     <TableHead>
                                         <Button
-                                            variant='ghos'
-                                            className='inline-flex group'
+                                            variant="ghos"
+                                            className="group inline-flex"
                                             onClick={() => onSortable('created_at')}
-                                        />
-                                        Dibuat Pada
-
-                                        <span className="flex-none ml-2 rounded text-muted-foreground">
-                                            <IconArrowsDownUp className="size-4" />
-                                        </span>
+                                        >
+                                            Dibuat Pada
+                                            <span className="ml-2 flex-none rounded text-muted-foreground">
+                                                <IconArrowsDownUp className="size-4" />
+                                            </span>
+                                        </Button>
                                     </TableHead>
 
                                     <TableHead>Aksi</TableHead>
-
                                 </TableRow>
                             </TableHeader>
 
                             <TableBody>
                                 {roles.map((role, index) => (
-                                    <TableRow
-                                        key={index}
-                                    >
+                                    <TableRow key={index}>
                                         <TableCell>{index + 1 + (meta.current_page - 1) * meta.per_page}</TableCell>
-
 
                                         <TableCell>{role.name}</TableCell>
                                         <TableCell>{role.guard_name}</TableCell>
-                                        <TableCell>{formatDateIndo(goal.created_at)}</TableCell>
+                                        <TableCell>{formatDateIndo(role.created_at)}</TableCell>
 
                                         <TableCell>
-                                            <div className="flex flex-items-center gap-x-1">
-                                                <Button variant='blue' size='sm' asChild>
-                                                    <Link href={route('roles.edit', [goal])}>
+                                            <div className="flex-items-center flex gap-x-1">
+                                                <Button variant="blue" size="sm" asChild>
+                                                    <Link href={route('roles.edit', [role.id])}>
                                                         <IconPencil className="size-4" />
                                                     </Link>
                                                 </Button>
 
                                                 <AlertAction
                                                     trigger={
-                                                        <Button variant='red' size='sm'>
+                                                        <Button variant="red" size="sm">
                                                             <IconTrash className="size-4" />
                                                         </Button>
                                                     }
@@ -170,9 +159,10 @@ export default function Index(props)
                     )}
                 </CardContent>
 
-                <CardFooter className='flex flex-col items-center justify-between w-full py-3 border-t gap-y-2 lg:flex-row'>
+                <CardFooter className="flex w-full flex-col items-center justify-between gap-y-2 border-t py-3 lg:flex-row">
                     <p className="text-sm text-muted-foreground">
-                        Menampilkan <span className="font-medium text-emerald-600">{meta.from ?? 0}</span> dari {meta.total} role
+                        Menampilkan <span className="font-medium text-emerald-600">{meta.from ?? 0}</span> dari{' '}
+                        {meta.total} role
                     </p>
 
                     <div className="overflow-x-auto">
@@ -181,8 +171,7 @@ export default function Index(props)
                 </CardFooter>
             </Card>
         </div>
-    )
+    );
 }
 
-
-Index.layout = (page) => <AppLayout title={page.props.pageSettings.title} children={page}/>
+Index.layout = (page) => <AppLayout title={page.props.pageSettings.title} children={page} />;
