@@ -2,17 +2,16 @@
 
 namespace App\Enums;
 
-enum MessageType: string 
+enum MessageType: string
 {
-    case CREATED = "Berhasil menambahkan";
-    case UPDATED = "Berhasil memperbaharui";
-    case DELETED = "Berhasil menghapus";
-    case ERROR   = "Terjadi kesalahan. Silahkan coba lagi nanti.";
+    case CREATED = 'Berhasil menambahkan';
+    case UPDATED = 'Berhasil memperbaharui';
+    case DELETED = 'Berhasil menghapus';
+    case ERROR = 'Terjadi kesalahan. Silahkan coba lagi nanti.';
 
     public function message(string $entity = '', ?string $error = null): string
     {
-        if($this === MessageType::ERROR & $error)
-        { 
+        if ($this === MessageType::ERROR & $error) {
             return "{$this->value} {$error}";
         }
 
