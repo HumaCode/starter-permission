@@ -9,6 +9,7 @@ import ThemeSwitcher from "@/Components/Dark/ThemeSwitcher";
 export default function AppLayout({ title, children }) {
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const auth = usePage().props.auth.user;
 
     const { url } = usePage();
 
@@ -64,6 +65,7 @@ export default function AppLayout({ title, children }) {
 
                                     <div className="flex flex-col px-6 pb-2 overflow-y-auto bg-white grow gap-y-5 dark:bg-background">
                                         {/* sidebar */}
+                                        <Sidebar auth={auth} url={url} />
                                     </div>
 
                                 </Dialog.Panel>
@@ -76,7 +78,7 @@ export default function AppLayout({ title, children }) {
                     <div className="flex flex-col px-4 overflow-y-auto grow gap-y-5 bg-slate-50 dark:border-r dark:border-r-card dark:bg-background">
                         {/* sidebar */}
 
-                        <Sidebar url={url} />
+                        <Sidebar auth={auth} url={url} />
                     </div>
                 </div>
 
