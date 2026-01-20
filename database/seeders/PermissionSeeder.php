@@ -3,22 +3,18 @@
 namespace Database\Seeders;
 
 use App\Models\Shield\Permission;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class PermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Clear cache
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Define modules and their CRUD permissions
         $modules = [
             'dashboard',
+            'product',     // ← Tambah ini
             'user',
             'role',
             'permission',
@@ -32,27 +28,25 @@ class PermissionSeeder extends Seeder
 
         $permissions = [];
 
-        // Generate permissions for each module
         foreach ($modules as $module) {
             foreach ($actions as $action) {
                 $permissions[] = [
+                    'id' => (string) Str::uuid(),
                     'name' => "{$action}.{$module}",
                     'guard_name' => 'web',
                 ];
             }
         }
 
-        // Additional specific permissions
         $additionalPermissions = [
-            ['name' => 'export.report', 'guard_name' => 'web'],
-            ['name' => 'import.user', 'guard_name' => 'web'],
-            ['name' => 'restore.user', 'guard_name' => 'web'],
-            ['name' => 'forceDelete.user', 'guard_name' => 'web'],
+            ['id' => (string) Str::uuid(), 'name' => 'export.report', 'guard_name' => 'web'],
+            ['id' => (string) Str::uuid(), 'name' => 'import.user', 'guard_name' => 'web'],
+            ['id' => (string) Str::uuid(), 'name' => 'restore.user', 'guard_name' => 'web'],
+            ['id' => (string) Str::uuid(), 'name' => 'forceDelete.user', 'guard_name' => 'web'],
         ];
 
         $permissions = array_merge($permissions, $additionalPermissions);
 
-        // Create permissions
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(
                 ['name' => $permission['name'], 'guard_name' => $permission['guard_name']],
@@ -61,5 +55,26 @@ class PermissionSeeder extends Seeder
         }
 
         $this->command->info('Permissions created successfully!');
+        $this->command->info('Total permissions: ' . count($permissions));
     }
 }
+
+// ```
+
+// ## 📊 Struktur Menu yang Dihasilkan
+// ```
+// ┌─────────────────────────────┐
+// │ Dashboard                   │ ← No category, direct link
+// ├─────────────────────────────┤
+// │ MASTER                      │ ← Category header
+// │   📦 Produk                 │ ← Direct link (no children)
+// ├─────────────────────────────┤
+// │ ROLE PERMISSION             │ ← Category header
+// │   🛡️ Role                   │ ← Direct link (no children)
+// │   🔒 Permission             │ ← Direct link (no children)
+// │   ✅ User Akses             │ ← Direct link (no children)
+// ├─────────────────────────────┤
+// │ SETTING                     │ ← Category header
+// │   👥 User                   │ ← Direct link (no children)
+// │   🌐 Setting Website        │ ← Direct link (no children)
+// └─────────────────────────────┘

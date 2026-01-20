@@ -9,9 +9,12 @@ import { IconLogout2 } from '@tabler/icons-react';
 export default function Sidebar({ auth, url, menus = [] }) {
     const user = auth?.user || auth;
 
+    // ← Safety check: pastikan menus adalah array
+    const menusArray = Array.isArray(menus) ? menus : [];
+
     // Separate menus with and without category
-    const menusWithoutCategory = menus.filter((menu) => !menu.metadata?.category);
-    const menusWithCategory = menus.filter((menu) => menu.metadata?.category);
+    const menusWithoutCategory = menusArray.filter(menu => !menu.metadata?.category);
+    const menusWithCategory = menusArray.filter(menu => menu.metadata?.category);
 
     // Group menus with category
     const groupedMenus = menusWithCategory.reduce((acc, menu) => {
@@ -76,7 +79,11 @@ export default function Sidebar({ auth, url, menus = [] }) {
                         <li>
                             <ul className="space-y-0.5">
                                 {menusWithoutCategory.map((menu) => (
-                                    <MenuLink key={menu.id} menu={menu} currentUrl={url} />
+                                    <MenuLink
+                                        key={menu.id}
+                                        menu={menu}
+                                        currentUrl={url}
+                                    />
                                 ))}
                             </ul>
                         </li>
@@ -101,13 +108,17 @@ export default function Sidebar({ auth, url, menus = [] }) {
                                 {/* Category Menus */}
                                 <ul className="space-y-0.5">
                                     {groupedMenus[category].map((menu) => (
-                                        <MenuLink key={menu.id} menu={menu} currentUrl={url} />
+                                        <MenuLink
+                                            key={menu.id}
+                                            menu={menu}
+                                            currentUrl={url}
+                                        />
                                     ))}
                                 </ul>
                             </li>
                         ))
                     ) : menusWithoutCategory.length === 0 ? (
-                        <li className="px-3 py-4 text-center text-sm italic text-muted-foreground dark:text-gray-500">
+                        <li className="px-3 py-4 text-center text-sm text-muted-foreground dark:text-gray-500 italic">
                             No menus available
                         </li>
                     ) : null}

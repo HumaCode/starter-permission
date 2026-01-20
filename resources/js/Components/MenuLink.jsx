@@ -1,8 +1,8 @@
-import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { IconChevronDown } from '@tabler/icons-react';
 import { useState } from 'react';
+import { IconChevronDown } from '@tabler/icons-react';
 import DynamicIcon from './DynamicIcon';
+import { cn } from '@/lib/utils';
 
 export default function MenuLink({ menu, currentUrl, level = 0 }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +18,9 @@ export default function MenuLink({ menu, currentUrl, level = 0 }) {
         2: 'pl-9', // Childmenu level
     };
 
-    // If has children, render as collapsible button
+    // ============================================
+    // CASE 1: Has children - Render as collapsible button (no link)
+    // ============================================
     if (hasChildren) {
         return (
             <li>
@@ -29,7 +31,7 @@ export default function MenuLink({ menu, currentUrl, level = 0 }) {
                         'hover:bg-accent/50 dark:hover:bg-accent/30',
                         'text-foreground dark:text-gray-200',
                         isOpen && 'bg-accent/30 dark:bg-accent/20',
-                        paddingLeft[level],
+                        paddingLeft[level]
                     )}
                 >
                     <div className="flex items-center gap-x-3">
@@ -41,10 +43,12 @@ export default function MenuLink({ menu, currentUrl, level = 0 }) {
                         )}
                         <span className="dark:text-gray-200">{menu.name}</span>
                     </div>
+
+                    {/* Arrow - Only show if has children */}
                     <IconChevronDown
                         className={cn(
-                            'size-4 shrink-0 text-muted-foreground transition-transform duration-200 dark:text-gray-400',
-                            isOpen && 'rotate-180',
+                            'size-4 shrink-0 transition-transform duration-200 text-muted-foreground dark:text-gray-400',
+                            isOpen && 'rotate-180'
                         )}
                     />
                 </button>
@@ -53,7 +57,12 @@ export default function MenuLink({ menu, currentUrl, level = 0 }) {
                 {isOpen && (
                     <ul className="mt-1 space-y-0.5">
                         {menu.children.map((child) => (
-                            <MenuLink key={child.id} menu={child} currentUrl={currentUrl} level={level + 1} />
+                            <MenuLink
+                                key={child.id}
+                                menu={child}
+                                currentUrl={currentUrl}
+                                level={level + 1}
+                            />
                         ))}
                     </ul>
                 )}
@@ -61,38 +70,43 @@ export default function MenuLink({ menu, currentUrl, level = 0 }) {
         );
     }
 
-    // If has route, render as link
+    // ============================================
+    // CASE 2: No children but has route - Render as direct link (no arrow)
+    // ============================================
     if (menu.route) {
         return (
             <li>
                 <Link
                     href={route(menu.route)}
                     className={cn(
-                        'flex items-center gap-x-3 rounded-lg py-2.5 pr-3 text-sm font-medium transition-all',
+                        'flex w-full items-center gap-x-3 rounded-lg py-2.5 pr-3 text-sm font-medium transition-all',
                         'hover:bg-accent/50 dark:hover:bg-accent/30',
                         isActive
                             ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100'
                             : 'text-foreground dark:text-gray-200',
-                        paddingLeft[level],
+                        paddingLeft[level]
                     )}
                 >
                     {menu.icon && (
                         <DynamicIcon
                             name={menu.icon}
                             className={cn(
-                                'size-4 shrink-0',
+                                "size-4 shrink-0",
                                 isActive
-                                    ? 'text-emerald-700 dark:text-emerald-400'
-                                    : 'text-muted-foreground dark:text-gray-400',
+                                    ? "text-emerald-700 dark:text-emerald-400"
+                                    : "text-muted-foreground dark:text-gray-400"
                             )}
                         />
                     )}
                     <span>{menu.name}</span>
+                    {/* NO ARROW HERE - Direct link */}
                 </Link>
             </li>
         );
     }
 
-    // No route and no children - just display text (shouldn't happen normally)
+    // ============================================
+    // CASE 3: No route and no children - Don't render (shouldn't happen)
+    // ============================================
     return null;
 }

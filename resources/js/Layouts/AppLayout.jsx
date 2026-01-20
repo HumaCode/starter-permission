@@ -13,6 +13,17 @@ export default function AppLayout({ title, children }) {
     const { auth, menus = [] } = usePage().props; // ← Tambahkan menus di sini
     const { url } = usePage();
 
+      // ← DEBUG
+      console.log('=== DEBUG MENUS ===');
+      console.log('Current URL:', url);
+      console.log('Current Route:', window.location.pathname);
+      console.log('Menus Type:', typeof menus);
+      console.log('Is Array?:', Array.isArray(menus));
+      console.log('Menus Count:', Array.isArray(menus) ? menus.length : 'NOT ARRAY');
+      console.log('Menus Data:', menus);
+      console.log('Auth User:', auth?.user);
+      console.log('===================');
+
     return (
         <>
             <Head title={title} />
@@ -64,7 +75,7 @@ export default function AppLayout({ title, children }) {
 
                                     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-2 dark:bg-background">
                                         {/* Mobile Sidebar */}
-                                        <Sidebar auth={auth} url={window.location.pathname} menus={menus} />
+                                        <Sidebar auth={auth} url={url} menus={menus} />
                                     </div>
                                 </Dialog.Panel>
                             </Transition.Child>
@@ -75,7 +86,7 @@ export default function AppLayout({ title, children }) {
                 {/* Desktop Sidebar */}
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-slate-50 px-4 dark:border-r dark:border-r-card dark:bg-background">
-                        <Sidebar auth={auth} url={window.location.pathname} menus={menus} />
+                        <Sidebar auth={auth} url={url} menus={menus} />
                     </div>
                 </div>
 

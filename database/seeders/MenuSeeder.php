@@ -14,7 +14,7 @@ class MenuSeeder extends Seeder
     public function run(): void
     {
         // Helper function to get permission ID safely
-        $getPermission = function ($permissionName) {
+        $getPermission = function($permissionName) {
             $permission = Permission::where('name', $permissionName)->first();
             if (!$permission) {
                 $this->command->warn("Permission '{$permissionName}' not found. Skipping...");
@@ -24,10 +24,9 @@ class MenuSeeder extends Seeder
         };
 
         // ==========================================
-        // NO CATEGORY (Top Level Menus)
+        // DASHBOARD (No Category)
         // ==========================================
 
-        // 1. Dashboard Menu (No Category)
         $dashboard = Menu::firstOrCreate(
             ['slug' => 'dashboard'],
             [
@@ -38,7 +37,7 @@ class MenuSeeder extends Seeder
                 'order' => 1,
                 'is_active' => true,
                 'level' => 'menu',
-                'metadata' => null, // ← No category
+                'metadata' => null,
             ]
         );
 
@@ -51,14 +50,14 @@ class MenuSeeder extends Seeder
         // MASTER CATEGORY
         // ==========================================
 
-        // 2. Master Data Menu (Parent with Children)
-        $masterData = Menu::firstOrCreate(
-            ['slug' => 'master-data'],
+        // Produk Menu (Direct Link - No Children)
+        $produk = Menu::firstOrCreate(
+            ['slug' => 'produk'],
             [
-                'name' => 'Master Data',
-                'slug' => 'master-data',
-                'route' => null,
-                'icon' => 'IconDatabase',
+                'name' => 'Produk',
+                'slug' => 'produk',
+                'route' => 'products.index',
+                'icon' => 'IconPackage',
                 'order' => 2,
                 'is_active' => true,
                 'level' => 'menu',
@@ -66,214 +65,119 @@ class MenuSeeder extends Seeder
             ]
         );
 
-        // 2.1 Users Submenu (Has Children)
-        $users = Menu::firstOrCreate(
-            ['slug' => 'users', 'parent_id' => $masterData->id],
-            [
-                'parent_id' => $masterData->id,
-                'name' => 'Users',
-                'slug' => 'users',
-                'route' => null,
-                'icon' => 'IconUsers',
-                'order' => 1,
-                'is_active' => true,
-                'level' => 'submenu',
-            ]
-        );
-
-        // 2.1.1 User List Child Menu
-        $userList = Menu::firstOrCreate(
-            ['slug' => 'user-list', 'parent_id' => $users->id],
-            [
-                'parent_id' => $users->id,
-                'name' => 'User List',
-                'slug' => 'user-list',
-                'route' => 'users.index',
-                'icon' => 'IconList',
-                'order' => 1,
-                'is_active' => true,
-                'level' => 'childmenu',
-            ]
-        );
-
-        $userListPermission = $getPermission('read.user');
-        if ($userListPermission) {
-            $userList->permissions()->sync([$userListPermission]);
+        $produkPermission = $getPermission('read.product');
+        if ($produkPermission) {
+            $produk->permissions()->sync([$produkPermission]);
         }
 
-        // 2.1.2 User Roles Child Menu
-        $userRoles = Menu::firstOrCreate(
-            ['slug' => 'user-roles', 'parent_id' => $users->id],
+        // ==========================================
+        // ROLE PERMISSION CATEGORY
+        // ==========================================
+
+        // Role Menu (Direct Link - No Children)
+        $role = Menu::firstOrCreate(
+            ['slug' => 'role'],
             [
-                'parent_id' => $users->id,
-                'name' => 'User Roles',
-                'slug' => 'user-roles',
+                'name' => 'Role',
+                'slug' => 'role',
                 'route' => 'roles.index',
                 'icon' => 'IconShield',
-                'order' => 2,
-                'is_active' => true,
-                'level' => 'childmenu',
-            ]
-        );
-
-        $userRolesPermission = $getPermission('read.role');
-        if ($userRolesPermission) {
-            $userRoles->permissions()->sync([$userRolesPermission]);
-        }
-
-        // 2.2 Menu Management Submenu (No Children - Direct Link)
-        $menuManagement = Menu::firstOrCreate(
-            ['slug' => 'menu-management', 'parent_id' => $masterData->id],
-            [
-                'parent_id' => $masterData->id,
-                'name' => 'Menu Management',
-                'slug' => 'menu-management',
-                'route' => 'menus.index',
-                'icon' => 'IconMenu2',
-                'order' => 2,
-                'is_active' => true,
-                'level' => 'submenu',
-            ]
-        );
-
-        $menuManagementPermission = $getPermission('read.menu');
-        if ($menuManagementPermission) {
-            $menuManagement->permissions()->sync([$menuManagementPermission]);
-        }
-
-        // ==========================================
-        // SETTINGS CATEGORY
-        // ==========================================
-
-        // 3. Settings Menu (Parent)
-        $settings = Menu::firstOrCreate(
-            ['slug' => 'settings'],
-            [
-                'name' => 'Settings',
-                'slug' => 'settings',
-                'route' => null,
-                'icon' => 'IconSettings',
                 'order' => 3,
                 'is_active' => true,
                 'level' => 'menu',
-                'metadata' => ['category' => 'Settings'],
+                'metadata' => ['category' => 'Role Permission'],
             ]
         );
 
-        // 3.1 Website Settings Submenu (Direct Link)
-        $websiteSettings = Menu::firstOrCreate(
-            ['slug' => 'website-settings', 'parent_id' => $settings->id],
-            [
-                'parent_id' => $settings->id,
-                'name' => 'Website',
-                'slug' => 'website-settings',
-                'route' => 'settings.website',
-                'icon' => 'IconWorld',
-                'order' => 1,
-                'is_active' => true,
-                'level' => 'submenu',
-            ]
-        );
-
-        $websitePermission = $getPermission('read.setting');
-        if ($websitePermission) {
-            $websiteSettings->permissions()->sync([$websitePermission]);
+        $rolePermission = $getPermission('read.role');
+        if ($rolePermission) {
+            $role->permissions()->sync([$rolePermission]);
         }
 
-        // 3.2 Profile Submenu (Direct Link)
-        $profile = Menu::firstOrCreate(
-            ['slug' => 'profile', 'parent_id' => $settings->id],
+        // Permission Menu (Direct Link - No Children)
+        $permission = Menu::firstOrCreate(
+            ['slug' => 'permission'],
             [
-                'parent_id' => $settings->id,
-                'name' => 'Profile',
-                'slug' => 'profile',
-                'route' => 'profile.edit',
-                'icon' => 'IconUser',
-                'order' => 2,
-                'is_active' => true,
-                'level' => 'submenu',
-            ]
-        );
-
-        $profilePermission = $getPermission('read.profile');
-        if ($profilePermission) {
-            $profile->permissions()->sync([$profilePermission]);
-        }
-
-        // ==========================================
-        // REPORTS CATEGORY
-        // ==========================================
-
-        // 4. Reports Menu (Parent)
-        $reports = Menu::firstOrCreate(
-            ['slug' => 'reports'],
-            [
-                'name' => 'Reports',
-                'slug' => 'reports',
-                'route' => null,
-                'icon' => 'IconChartBar',
+                'name' => 'Permission',
+                'slug' => 'permission',
+                'route' => 'permissions.index',
+                'icon' => 'IconLock',
                 'order' => 4,
                 'is_active' => true,
                 'level' => 'menu',
-                'metadata' => ['category' => 'Reports'],
+                'metadata' => ['category' => 'Role Permission'],
             ]
         );
 
-        // 4.1 Sales Report Submenu (Has Children)
-        $salesReport = Menu::firstOrCreate(
-            ['slug' => 'sales-report', 'parent_id' => $reports->id],
-            [
-                'parent_id' => $reports->id,
-                'name' => 'Sales Report',
-                'slug' => 'sales-report',
-                'route' => null,
-                'icon' => 'IconShoppingCart',
-                'order' => 1,
-                'is_active' => true,
-                'level' => 'submenu',
-            ]
-        );
-
-        // 4.1.1 Monthly Report Child Menu
-        $monthlyReport = Menu::firstOrCreate(
-            ['slug' => 'monthly-report', 'parent_id' => $salesReport->id],
-            [
-                'parent_id' => $salesReport->id,
-                'name' => 'Monthly',
-                'slug' => 'monthly-report',
-                'route' => 'reports.monthly',
-                'icon' => 'IconCalendar',
-                'order' => 1,
-                'is_active' => true,
-                'level' => 'childmenu',
-            ]
-        );
-
-        $monthlyPermission = $getPermission('read.report');
-        if ($monthlyPermission) {
-            $monthlyReport->permissions()->sync([$monthlyPermission]);
+        $permissionPermission = $getPermission('read.permission');
+        if ($permissionPermission) {
+            $permission->permissions()->sync([$permissionPermission]);
         }
 
-        // 4.1.2 Daily Report Child Menu
-        $dailyReport = Menu::firstOrCreate(
-            ['slug' => 'daily-report', 'parent_id' => $salesReport->id],
+        // User Akses Menu (Direct Link - No Children)
+        $userAkses = Menu::firstOrCreate(
+            ['slug' => 'user-akses'],
             [
-                'parent_id' => $salesReport->id,
-                'name' => 'Daily',
-                'slug' => 'daily-report',
-                'route' => 'reports.daily',
-                'icon' => 'IconCalendarEvent',
-                'order' => 2,
+                'name' => 'User Akses',
+                'slug' => 'user-akses',
+                'route' => 'user-akses.index',
+                'icon' => 'IconUserCheck',
+                'order' => 5,
                 'is_active' => true,
-                'level' => 'childmenu',
+                'level' => 'menu',
+                'metadata' => ['category' => 'Role Permission'],
             ]
         );
 
-        $dailyPermission = $getPermission('read.report');
-        if ($dailyPermission) {
-            $dailyReport->permissions()->sync([$dailyPermission]);
+        $userAksesPermission = $getPermission('read.user');
+        if ($userAksesPermission) {
+            $userAkses->permissions()->sync([$userAksesPermission]);
         }
 
-        $this->command->info('Menus created successfully with categories!');
+        // ==========================================
+        // SETTING CATEGORY
+        // ==========================================
+
+        // User Menu (Direct Link - No Children)
+        $user = Menu::firstOrCreate(
+            ['slug' => 'user'],
+            [
+                'name' => 'User',
+                'slug' => 'user',
+                'route' => 'users.index',
+                'icon' => 'IconUsers',
+                'order' => 6,
+                'is_active' => true,
+                'level' => 'menu',
+                'metadata' => ['category' => 'Setting'],
+            ]
+        );
+
+        $userPermission = $getPermission('read.user');
+        if ($userPermission) {
+            $user->permissions()->sync([$userPermission]);
+        }
+
+        // Setting Website Menu (Direct Link - No Children)
+        $settingWebsite = Menu::firstOrCreate(
+            ['slug' => 'setting-website'],
+            [
+                'name' => 'Setting Website',
+                'slug' => 'setting-website',
+                'route' => 'settings.website',
+                'icon' => 'IconWorld',
+                'order' => 7,
+                'is_active' => true,
+                'level' => 'menu',
+                'metadata' => ['category' => 'Setting'],
+            ]
+        );
+
+        $settingPermission = $getPermission('read.setting');
+        if ($settingPermission) {
+            $settingWebsite->permissions()->sync([$settingPermission]);
+        }
+
+        $this->command->info('Menus created successfully with flat structure!');
     }
 }
