@@ -8,6 +8,7 @@ import DynamicIcon from '@/Components/DynamicIcon';
 import EmptyState from '@/Components/EmptyState';
 import HeaderTitle from '@/Components/HeaderTitle';
 import { UseFilter } from '@/Components/Hooks/UseFilter';
+import MenuTreeDialog from '@/Components/Menus/MenuTreeDialog';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/Components/ui/card';
@@ -22,6 +23,7 @@ import {
     IconPencil,
     IconPlus,
     IconTrash,
+    IconTree,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -29,6 +31,7 @@ export default function Index(props) {
     const { data: menu, meta, links } = props.menu;
 
     const [params, setParams] = useState(props.state);
+    const [showTreeDialog, setShowTreeDialog] = useState(false);
 
     const onSortable = (field) => {
         setParams({
@@ -75,12 +78,13 @@ export default function Index(props) {
                         />
 
                         <div className="flex gap-2">
-                            {/* <Button variant="outline" size="xl" asChild>
-                                <Link href={route('menus.tree')}>
-                                    <IconLayoutGrid className="size-4" />
-                                    Lihat Tree
-                                </Link>
-                            </Button> */}
+                            <Button size="xl"
+                                variant="red"
+                                onClick={() => setShowTreeDialog(true)}
+                            >
+                                <IconTree className="mr-2 size-4" />
+                                Tree View
+                            </Button>
 
                             <Button variant="emerald" size="xl" asChild>
                                 <Link href={route('menus.create')}>
@@ -325,6 +329,13 @@ export default function Index(props) {
                     </div>
                 </CardFooter>
             </Card>
+
+            {/* Menu Tree Dialog */}
+            <MenuTreeDialog
+                open={showTreeDialog}
+                onOpenChange={setShowTreeDialog}
+                menus={menu.data}
+            />
         </div>
     );
 }

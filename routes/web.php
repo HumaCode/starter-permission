@@ -42,6 +42,7 @@ Route::controller(MenuController::class)->group(function () {
 // menu
 Route::controller(MenuController::class)->group(function () {
     Route::get('menus', 'index')->name('menus.index');
+    Route::get('menus-tree', 'tree')->name('menus.tree');
     Route::get('menus/create', 'create')->name('menus.create');
     Route::post('menus/create', 'store')->name('menus.store');
     Route::get('menus/{menu}/edit', 'edit')->name('menus.edit');

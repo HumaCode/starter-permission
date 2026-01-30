@@ -78,4 +78,33 @@ class MenuController extends Controller implements HasMiddleware
             'year' => fn() => now()->year(),
         ]);
     }
+
+    /**
+     * Display menu tree view
+     */
+    public function tree(): Response
+    {
+        // Get all menus with hierarchical structure
+        $menus = Menu::with(['children.children', 'permissions'])
+            ->whereNull('parent_id')
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
+        return inertia('Menus/Tree', [
+            'pageSettings' => [
+                'title' => 'Menu Tree',
+                'subtitle' => 'Visualisasi struktur menu secara hierarki.',
+                'banner' => [
+                    'title' => 'Menu Tree Structure',
+                    'subtitle' => 'Lihat dan kelola struktur menu dalam bentuk tree view.'
+                ],
+            ],
+            'menus' => MenuResource::collection($menus),
+            'items' => [
+                ['label' => 'Menu Management', 'href' => route('menus.index')],
+                ['label' => 'Tree View'],
+            ],
+        ]);
+    }
 }
