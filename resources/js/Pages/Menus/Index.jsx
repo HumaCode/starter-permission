@@ -26,7 +26,7 @@ import {
 import { useState } from 'react';
 
 export default function Index(props) {
-    const { data: menus, meta, links } = props.menus;
+    const { data: menu, meta, links } = props.menu;
 
     const [params, setParams] = useState(props.state);
 
@@ -41,7 +41,7 @@ export default function Index(props) {
     UseFilter({
         route: route('menus.index'),
         values: params,
-        only: ['menus'],
+        only: ['menu'],
     });
 
     const handleDelete = (menu) => {
@@ -96,7 +96,7 @@ export default function Index(props) {
                 </CardHeader>
 
                 <CardContent className="p-0">
-                    {menus.length === 0 ? (
+                    {menu.length === 0 ? (
                         <EmptyState
                             icon={IconMenu2}
                             title="Tidak ada data menu"
@@ -196,7 +196,7 @@ export default function Index(props) {
                                 </TableHeader>
 
                                 <TableBody>
-                                    {menus.map((menu, index) => (
+                                    {menu.map((menu, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="text-center font-medium">
                                                 {index + 1 + (meta.current_page - 1) * meta.per_page}

@@ -20,7 +20,7 @@ class MenuController extends Controller implements HasMiddleware
 
     public function index(): Response
     {
-        $menus = Menu::query()
+        $menu = Menu::query()
             ->with(['parent:id,name', 'permissions:id,name'])
             ->select(['id', 'parent_id', 'level', 'name', 'slug', 'route', 'icon', 'order', 'is_active', 'created_at'])
             ->filter(request()->only(['search', 'level', 'parent_id', 'is_active']))
@@ -36,9 +36,9 @@ class MenuController extends Controller implements HasMiddleware
                     'subtitle' => 'Atur struktur menu dan permission untuk mengontrol akses halaman setiap user.'
                 ],
             ],
-            'menus' => fn() => MenuResource::collection($menus)->additional([
+            'menu' => fn() => MenuResource::collection($menu)->additional([
                 'meta' => [
-                    'has_pages' => $menus->hasPages()
+                    'has_pages' => $menu->hasPages()
                 ]
             ]),
             'state' => fn() => [

@@ -13,17 +13,6 @@ export default function AppLayout({ title, children }) {
     const { auth, menus = [] } = usePage().props; // ← Tambahkan menus di sini
     const { url } = usePage();
 
-      // ← DEBUG
-      console.log('=== DEBUG MENUS ===');
-      console.log('Current URL:', url);
-      console.log('Current Route:', window.location.pathname);
-      console.log('Menus Type:', typeof menus);
-      console.log('Is Array?:', Array.isArray(menus));
-      console.log('Menus Count:', Array.isArray(menus) ? menus.length : 'NOT ARRAY');
-      console.log('Menus Data:', menus);
-      console.log('Auth User:', auth?.user);
-      console.log('===================');
-
     return (
         <>
             <Head title={title} />

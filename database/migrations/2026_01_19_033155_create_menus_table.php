@@ -27,15 +27,6 @@ return new class extends Migration
             $table->index(['parent_id', 'order']);
             $table->index('level');
         });
-
-        Schema::create('menu_permission', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('menu_id')->constrained()->cascadeOnDelete();
-            $table->uuid('permission_id')->constrained()->cascadeOnDelete();
-            $table->timestamps();
-
-            $table->unique(['menu_id', 'permission_id']);
-        });
     }
 
     /**
@@ -43,7 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menu_permission');
         Schema::dropIfExists('menus');
     }
 };

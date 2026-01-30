@@ -4,72 +4,81 @@ namespace Database\Seeders;
 
 use App\Models\Shield\Permission;
 use App\Models\Shield\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Clear cache
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        // Get roles
+        $administrator = Role::where('name', 'administrator')->first();
+        $admin = Role::where('name', 'admin')->first();
+        $user = Role::where('name', 'user')->first();
 
-        // Get all roles
-        $administratorRole  = Role::where('name', 'administrator')->first();
-        $adminRole          = Role::where('name', 'admin')->first();
-        $userRole           = Role::where('name', 'user')->first();
-
-        // Administrator - Full Access (All Permissions)
+        // Get all permissions
         $allPermissions = Permission::all();
-        $administratorRole->syncPermissions($allPermissions);
 
-        // Admin - Limited Access
-        $adminPermissions = Permission::whereIn('name', [
-            // Dashboard
-            'read.dashboard',
+        // ==========================================
+        // ADMINISTRATOR - Full Access
+        // ==========================================
+        if ($administrator) {
+            $administrator->syncPermissions($allPermissions);
+            $this->command->info("Administrator role: {$allPermissions->count()} permissions assigned");
+        }
 
-            // Users
-            'read.user',
-            'create.user',
-            'update.user',
-            'delete.user',
+        // ==========================================
+        // ADMIN - Limited Access
+        // ==========================================
+        if ($admin) {
+            $adminPermissions = Permission::whereIn('name', [
+                // Dashboard
+                'read.dashboard',
 
-            // Roles (read only)
-            'read.role',
+                // Product
+                'read.product',
+                'create.product',
+                'update.product',
+                'delete.product',
 
-            // Reports
-            'read.report',
-            'export.report',
+                // User
+                'read.user',
+                'create.user',
+                'update.user',
 
-            // Profile
-            'read.profile',
-            'update.profile',
+                // Role (read only)
+                'read.role',
 
-            // Settings (read only)
-            'read.setting',
-        ])->get();
-        $adminRole->syncPermissions($adminPermissions);
+                // Permission (read only)
+                'read.permission',
 
-        // User - Very Limited Access
-        $userPermissions = Permission::whereIn('name', [
-            // Dashboard
-            'read.dashboard',
+                // Setting
+                'read.setting',
+                'update.setting',
+            ])->pluck('id');
 
-            // Profile only
-            'read.profile',
-            'update.profile',
+            $admin->syncPermissions($adminPermissions);
+            $this->command->info("Admin role: {$adminPermissions->count()} permissions assigned");
+        }
 
-            // Reports (read only)
-            'read.report',
-        ])->get();
-        $userRole->syncPermissions($userPermissions);
+        // ==========================================
+        // USER - Minimal Access
+        // ==========================================
+        if ($user) {
+            $userPermissions = Permission::whereIn('name', [
+                // Dashboard
+                'read.dashboard',
+
+                // Product (read only)
+                'read.product',
+
+                // User (read own data only)
+                'read.user',
+            ])->pluck('id');
+
+            $user->syncPermissions($userPermissions);
+            $this->command->info("User role: {$userPermissions->count()} permissions assigned");
+        }
 
         $this->command->info('Role permissions assigned successfully!');
-        $this->command->info('Administrator: Full access to all permissions');
-        $this->command->info('Admin: Limited access (users, reports, basic settings)');
-        $this->command->info('User: Minimal access (dashboard, profile, view reports)');
     }
 }

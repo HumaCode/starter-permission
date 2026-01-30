@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 class MenuHelper
 {
     /**
-     * Get user accessible menus (WITH CACHE)
+     * Get user accessible menus (WITH CACHE & BETTER DEBUGGING)
      */
     public static function getUserMenus(): Collection
     {
@@ -21,14 +21,15 @@ class MenuHelper
             return collect([]);
         }
 
-        // Cache key based on user ID and roles
-        $roleIds = $user->roles->pluck('id')->sort()->implode(',');
-        $cacheKey = 'user_menus_' . $user->id . '_' . md5($roleIds);
-        $cacheDuration = 3600; // 1 hour
+        // Disable cache for debugging
+        // $roleIds = $user->roles->pluck('id')->sort()->implode(',');
+        // $cacheKey = 'user_menus_' . $user->id . '_' . md5($roleIds);
+        // $cacheDuration = 3600;
 
-        return Cache::remember($cacheKey, $cacheDuration, function () use ($user) {
+        // return Cache::remember($cacheKey, $cacheDuration, function () use ($user) {
             Log::info('Loading menus from database', [
                 'user_id' => $user->id,
+                'user_email' => $user->email,
                 'roles' => $user->getRoleNames()->toArray()
             ]);
 
@@ -49,49 +50,56 @@ class MenuHelper
             }
 
             // Get user permissions
-            $userPermissions = $user->getAllPermissions()->pluck('id');
+            $userPermissions = $user->getAllPermissions();
+            $userPermissionIds = $userPermissions->pluck('id')->toArray();
+            $userPermissionNames = $userPermissions->pluck('name')->toArray();
 
-            if ($userPermissions->isEmpty()) {
-                Log::warning('User has no permissions', ['user_id' => $user->id]);
+            Log::info('User permissions', [
+                'count' => count($userPermissionIds),
+                'ids' => $userPermissionIds,
+                'names' => $userPermissionNames
+            ]);
+
+            if (empty($userPermissionIds)) {
+                Log::warning('User has no permissions', [
+                    'user_id' => $user->id,
+                    'roles' => $user->getRoleNames()->toArray()
+                ]);
                 return collect([]);
             }
 
-            Log::info('User permissions loaded', [
-                'user_id' => $user->id,
-                'permissions_count' => $userPermissions->count()
+            // Get ALL root menus first to debug
+            $allMenus = Menu::with('permissions')->whereNull('parent_id')->where('is_active', true)->get();
+
+            Log::info('All root menus', [
+                'count' => $allMenus->count(),
+                'menus' => $allMenus->map(function($menu) {
+                    return [
+                        'name' => $menu->name,
+                        'permissions_count' => $menu->permissions->count(),
+                        'permission_ids' => $menu->permissions->pluck('id')->toArray(),
+                        'permission_names' => $menu->permissions->pluck('name')->toArray(),
+                    ];
+                })->toArray()
             ]);
 
-            // Get menus with permission check (recursive)
-            $menus = self::getMenusWithPermissions($userPermissions);
+            // Get root menus with permission check
+            $menus = Menu::with(['children.children', 'permissions'])
+                ->whereNull('parent_id')
+                ->where('is_active', true)
+                ->whereHas('permissions', function ($q) use ($userPermissionIds) {
+                    $q->whereIn('permissions.id', $userPermissionIds);
+                })
+                ->orderBy('order')
+                ->get();
 
-            Log::info('User menus loaded', [
+            Log::info('Filtered menus for user', [
                 'count' => $menus->count(),
                 'menus' => $menus->pluck('name')->toArray()
             ]);
 
             return $menus;
-        });
-    }
-
-    /**
-     * Recursive get menus with permission filtering
-     */
-    protected static function getMenusWithPermissions($permissionIds, $parentId = null): Collection
-    {
-        return Menu::with(['children.children', 'permissions'])
-            ->where('parent_id', $parentId)
-            ->where('is_active', true)
-            ->where(function ($query) use ($permissionIds) {
-                $query->whereHas('permissions', function ($q) use ($permissionIds) {
-                    $q->whereIn('permissions.id', $permissionIds);
-                })->orWhereHas('children.permissions', function ($q) use ($permissionIds) {
-                    $q->whereIn('permissions.id', $permissionIds);
-                })->orWhereHas('children.children.permissions', function ($q) use ($permissionIds) {
-                    $q->whereIn('permissions.id', $permissionIds);
-                });
-            })
-            ->orderBy('order')
-            ->get();
+        // });
     }
 
     /**
@@ -138,9 +146,7 @@ class MenuHelper
      */
     public static function clearAllCache(): void
     {
-        // Clear all cache keys starting with 'user_menus_'
-        Cache::flush(); // Or use specific pattern if using Redis
-
+        Cache::flush();
         Log::info('All menu caches cleared');
     }
 

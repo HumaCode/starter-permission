@@ -31,5 +31,5 @@ class RoleRequest extends FormRequest
         return [
             'name'              => 'Nama',
         ];
-
+    }
 }

@@ -3,181 +3,182 @@
 namespace Database\Seeders;
 
 use App\Models\Menu;
+use App\Models\Shield\Permission;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 
 class MenuSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Helper function to get permission ID safely
-        $getPermission = function($permissionName) {
+        $this->command->info('🔄 Starting menu seeding...');
+
+        // Clear pivot table
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('menu_permission')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        // Helper function with DIRECT SQL INSERT
+        $syncPermission = function($menu, $permissionName) {
             $permission = Permission::where('name', $permissionName)->first();
+
             if (!$permission) {
-                $this->command->warn("Permission '{$permissionName}' not found. Skipping...");
-                return null;
+                $this->command->error("❌ Permission '{$permissionName}' not found!");
+                return false;
             }
-            return $permission->id;
+
+            // Debug
+            $this->command->info("   Permission: {$permission->name}");
+            $this->command->info("   Permission ID: {$permission->id}");
+            $this->command->info("   Menu ID: {$menu->id}");
+
+            try {
+                // Use DB::insert with EXPLICIT string binding
+                DB::insert(
+                    'INSERT INTO menu_permission (menu_id, permission_id, created_at, updated_at) VALUES (?, ?, ?, ?)',
+                    [
+                        $menu->id,              // Already UUID string
+                        $permission->id,        // Already UUID string
+                        now(),
+                        now()
+                    ]
+                );
+
+                $this->command->info("   ✅ Inserted");
+
+                // Verify what was actually inserted
+                $verify = DB::select(
+                    'SELECT menu_id, permission_id FROM menu_permission WHERE menu_id = ? LIMIT 1',
+                    [$menu->id]
+                );
+
+                if (!empty($verify)) {
+                    $this->command->info("   ✅ Verified - permission_id: {$verify[0]->permission_id}");
+                } else {
+                    $this->command->error("   ❌ Verification failed - record not found");
+                }
+
+                return true;
+            } catch (\Exception $e) {
+                $this->command->error("   ❌ Error: " . $e->getMessage());
+                return false;
+            }
         };
 
-        // ==========================================
-        // DASHBOARD (No Category)
-        // ==========================================
-
-        $dashboard = Menu::firstOrCreate(
-            ['slug' => 'dashboard'],
+        // Create menus
+        $menus = [
             [
-                'name' => 'Dashboard',
                 'slug' => 'dashboard',
+                'name' => 'Dashboard',
                 'route' => 'dashboard',
                 'icon' => 'IconLayoutDashboard',
                 'order' => 1,
-                'is_active' => true,
-                'level' => 'menu',
-                'metadata' => null,
-            ]
-        );
-
-        $dashboardPermission = $getPermission('read.dashboard');
-        if ($dashboardPermission) {
-            $dashboard->permissions()->sync([$dashboardPermission]);
-        }
-
-        // ==========================================
-        // MASTER CATEGORY
-        // ==========================================
-
-        // Produk Menu (Direct Link - No Children)
-        $produk = Menu::firstOrCreate(
-            ['slug' => 'produk'],
+                'category' => null,
+                'permission' => 'read.dashboard',
+            ],
             [
-                'name' => 'Produk',
                 'slug' => 'produk',
+                'name' => 'Produk',
                 'route' => 'products.index',
                 'icon' => 'IconPackage',
                 'order' => 2,
-                'is_active' => true,
-                'level' => 'menu',
-                'metadata' => ['category' => 'Master'],
-            ]
-        );
-
-        $produkPermission = $getPermission('read.product');
-        if ($produkPermission) {
-            $produk->permissions()->sync([$produkPermission]);
-        }
-
-        // ==========================================
-        // ROLE PERMISSION CATEGORY
-        // ==========================================
-
-        // Role Menu (Direct Link - No Children)
-        $role = Menu::firstOrCreate(
-            ['slug' => 'role'],
+                'category' => 'Master',
+                'permission' => 'read.product',
+            ],
             [
-                'name' => 'Role',
+                'slug' => 'menu',
+                'name' => 'Menu',
+                'route' => 'menus.index',
+                'icon' => 'IconMenu',
+                'order' => 3,
+                'category' => 'Master',
+                'permission' => 'read.menu',
+            ],
+            [
                 'slug' => 'role',
+                'name' => 'Role',
                 'route' => 'roles.index',
                 'icon' => 'IconShield',
-                'order' => 3,
-                'is_active' => true,
-                'level' => 'menu',
-                'metadata' => ['category' => 'Role Permission'],
-            ]
-        );
-
-        $rolePermission = $getPermission('read.role');
-        if ($rolePermission) {
-            $role->permissions()->sync([$rolePermission]);
-        }
-
-        // Permission Menu (Direct Link - No Children)
-        $permission = Menu::firstOrCreate(
-            ['slug' => 'permission'],
+                'order' => 4,
+                'category' => 'Role Permission',
+                'permission' => 'read.role',
+            ],
             [
-                'name' => 'Permission',
                 'slug' => 'permission',
+                'name' => 'Permission',
                 'route' => 'permissions.index',
                 'icon' => 'IconLock',
-                'order' => 4,
-                'is_active' => true,
-                'level' => 'menu',
-                'metadata' => ['category' => 'Role Permission'],
-            ]
-        );
-
-        $permissionPermission = $getPermission('read.permission');
-        if ($permissionPermission) {
-            $permission->permissions()->sync([$permissionPermission]);
-        }
-
-        // User Akses Menu (Direct Link - No Children)
-        $userAkses = Menu::firstOrCreate(
-            ['slug' => 'user-akses'],
+                'order' => 5,
+                'category' => 'Role Permission',
+                'permission' => 'read.permission',
+            ],
             [
-                'name' => 'User Akses',
                 'slug' => 'user-akses',
+                'name' => 'User Akses',
                 'route' => 'user-akses.index',
                 'icon' => 'IconUserCheck',
-                'order' => 5,
-                'is_active' => true,
-                'level' => 'menu',
-                'metadata' => ['category' => 'Role Permission'],
-            ]
-        );
-
-        $userAksesPermission = $getPermission('read.user');
-        if ($userAksesPermission) {
-            $userAkses->permissions()->sync([$userAksesPermission]);
-        }
-
-        // ==========================================
-        // SETTING CATEGORY
-        // ==========================================
-
-        // User Menu (Direct Link - No Children)
-        $user = Menu::firstOrCreate(
-            ['slug' => 'user'],
+                'order' => 6,
+                'category' => 'Role Permission',
+                'permission' => 'read.user',
+            ],
             [
-                'name' => 'User',
                 'slug' => 'user',
+                'name' => 'User',
                 'route' => 'users.index',
                 'icon' => 'IconUsers',
-                'order' => 6,
-                'is_active' => true,
-                'level' => 'menu',
-                'metadata' => ['category' => 'Setting'],
-            ]
-        );
-
-        $userPermission = $getPermission('read.user');
-        if ($userPermission) {
-            $user->permissions()->sync([$userPermission]);
-        }
-
-        // Setting Website Menu (Direct Link - No Children)
-        $settingWebsite = Menu::firstOrCreate(
-            ['slug' => 'setting-website'],
+                'order' => 7,
+                'category' => 'Setting',
+                'permission' => 'read.user',
+            ],
             [
-                'name' => 'Setting Website',
                 'slug' => 'setting-website',
+                'name' => 'Setting Website',
                 'route' => 'settings.website',
                 'icon' => 'IconWorld',
-                'order' => 7,
-                'is_active' => true,
-                'level' => 'menu',
-                'metadata' => ['category' => 'Setting'],
-            ]
-        );
+                'order' => 8,
+                'category' => 'Setting',
+                'permission' => 'read.setting',
+            ],
+        ];
 
-        $settingPermission = $getPermission('read.setting');
-        if ($settingPermission) {
-            $settingWebsite->permissions()->sync([$settingPermission]);
+        foreach ($menus as $menuData) {
+            $this->command->info("\n📍 Creating {$menuData['name']}...");
+
+            $menu = Menu::updateOrCreate(
+                ['slug' => $menuData['slug']],
+                [
+                    'name' => $menuData['name'],
+                    'slug' => $menuData['slug'],
+                    'route' => $menuData['route'],
+                    'icon' => $menuData['icon'],
+                    'order' => $menuData['order'],
+                    'is_active' => true,
+                    'level' => 'menu',
+                    'metadata' => $menuData['category'] ? ['category' => $menuData['category']] : null,
+                ]
+            );
+
+            $syncPermission($menu, $menuData['permission']);
         }
 
-        $this->command->info('Menus created successfully with flat structure!');
+        // Final summary
+        $this->command->info("\n" . str_repeat('=', 60));
+        $this->command->info('📊 FINAL SUMMARY');
+        $this->command->info(str_repeat('=', 60));
+
+        $totalPivots = DB::table('menu_permission')->count();
+        $this->command->info("Total pivot records: {$totalPivots}");
+
+        $pivots = DB::select('SELECT menu_id, permission_id FROM menu_permission');
+        foreach ($pivots as $pivot) {
+            $menu = Menu::find($pivot->menu_id);
+            $perm = Permission::find($pivot->permission_id);
+
+            $menuName = $menu ? $menu->name : 'UNKNOWN';
+            $permName = $perm ? $perm->name : 'UNKNOWN';
+
+            $this->command->info("{$menuName} <-> {$permName}");
+            $this->command->info("  IDs: {$pivot->menu_id} <-> {$pivot->permission_id}");
+        }
     }
 }
